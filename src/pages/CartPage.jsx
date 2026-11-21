@@ -33,11 +33,20 @@ function CartPage() {
           const item = menuItems.find((entry) => entry.id === line.itemId);
           if (!item) return null;
           const atLimit = countOfItem(lines, line.itemId) >= MAX_QUANTITY;
+           // For deals, find the drink the customer chose
+          const choice = line.choiceId
+            ? menuItems.find((entry) => entry.id === line.choiceId)
+            : null;
 
           return (
             <li key={line.id} className="cart-line">
               <div className="cart-info">
                 <h2 className="cart-name">{item.name}</h2>
+                                {choice && item.deal && (
+                  <p className="cart-each">
+                    {item.deal.choiceLabel}: {choice.name}
+                  </p>
+                )}
                 <p className="cart-each">{formatPrice(item.price)} each</p>
                 {atLimit && <p className="limit-note">Limit reached ({MAX_QUANTITY} per order)</p>}
               </div>

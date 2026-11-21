@@ -3,6 +3,7 @@ import { CartContext } from "./cartContext";
 import { menuItems } from "../data/menuItems";
 import { checkQuantity } from "../utils/quantityRule";
 import { countOfItem } from "../utils/cartHelpers";
+import { checkDealChoice } from "../utils/dealRule";
 
 // A cart line is { id, itemId, choiceId, quantity }.
 // choiceId is for deals (the chosen drink); it is null for normal items.
@@ -15,6 +16,11 @@ function CartProvider({ children }) {
 
   // Each action returns { ok, message } so the screen can tell the user what happened.
   function addItem(item, choiceId = null) {
+        // Rule 2: a deal can only be added with exactly one valid drink
+    if (item.deal) {
+      const dealCheck = checkDealChoice(item.deal, choiceId === null ? [] : [choiceId]);
+      if (!dealCheck.ok) return dealCheck;
+    }
     const check = checkQuantity(countOfItem(lines, item.id) + 1, item.name);
     if (!check.ok) return check;
 

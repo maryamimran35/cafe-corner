@@ -202,3 +202,29 @@ a { color: var(--primary); }
   justify-self: start;
 }
 .subtotal { font-size: 1.3rem; margin: 16px 0 4px; }
+
+/* Deal drink choice */
+.deal-options { margin: 16px 0; }
+.deal-options h2 { margin: 0 0 4px; font-size: 1.2rem; }
+.deal-count { margin: 0 0 8px; font-weight: 600; }
+.option-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.option {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 14px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.option:hover { border-color: var(--primary); }
+.option-selected { border-color: var(--primary); background: #f3e6d8; font-weight: 600; }
+.option-state { color: var(--primary); font-weight: 700; }
+.hint { margin: 8px 0 0; color: #8a2b0e; font-weight: 600; }
