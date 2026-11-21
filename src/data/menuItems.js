@@ -6,7 +6,7 @@ export const CATEGORIES = [
   "Deals",
 ];
 
-export const menuItems = [
+const baseItems = [
   {
     id: 1, name: "Caramel Macchiato", category: "Hot Drinks", price: 650,
     serving: "1 cup, 350 ml", vegetarian: true, allergens: ["Milk"],
@@ -94,3 +94,23 @@ export const menuItems = [
     deal: { choiceLabel: "Cold drink", choiceIds: [5, 4, 6] },
   },
 ];
+const IMAGE_FILES = {
+  1: "caramel-macchiato",
+  2: "spanish-latte",
+  3: "karak-chai",
+  4: "vanilla-cold-brew",
+  5: "mint-lemonade",
+  6: "oreo-milkshake",
+  7: "blueberry-pancakes",
+  8: "nutella-waffle",
+  9: "butter-croissant",
+  10: "new-york-cheesecake",
+  11: "crispy-chicken-burger",
+  12: "loaded-nachos",
+  13: "study-break-deal",
+  14: "burger-combo",
+};
+export const menuItems = baseItems.map((item) => ({
+  ...item,
+  image: IMAGE_FILES[item.id] ? `/images/${IMAGE_FILES[item.id]}.webp` : null,
+}));
