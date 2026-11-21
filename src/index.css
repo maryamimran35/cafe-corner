@@ -109,3 +109,40 @@ a { color: var(--primary); }
 .card-price { font-weight: 700; font-size: 1.1rem; }
 
 .detail-list { padding-left: 20px; }
+
+/* Search, filter and sort bar */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 16px 0 8px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-weight: 600; font-size: 0.9rem; }
+.field input[type="search"],
+.field select {
+  font: inherit;
+  padding: 10px;
+  border: 1px solid #b9a691;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+}
+.field-check { flex-direction: row; align-items: center; gap: 8px; }
+.field-check input { width: 20px; height: 20px; }
+.result-count { color: var(--muted); margin: 8px 0 0; }
+
+/* Empty state */
+.empty-state {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 16px;
+  text-align: center;
+}
+.empty-state h2 { margin-top: 0; }
