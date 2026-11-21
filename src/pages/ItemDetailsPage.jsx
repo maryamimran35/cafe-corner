@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { menuItems } from "../data/menuItems";
+import { useCart } from "../context/useCart";
+import { MAX_QUANTITY } from "../utils/quantityRule";
+import { countOfItem } from "../utils/cartHelpers";
 import { formatPrice } from "../utils/format";
 
 function ItemDetailsPage() {
   // useParams reads :id from the URL. URL values are text, so convert to a number.
   const { id } = useParams();
   const item = menuItems.find((entry) => entry.id === Number(id));
+  const { lines, addItem } = useCart();
+  const [message, setMessage] = useState("");
 
   // Invalid ID: show useful feedback and a way forward
   if (!item) {
@@ -20,12 +26,20 @@ function ItemDetailsPage() {
     );
   }
 
-  // Deals list which items can be chosen
+  // Deals list which items can be chosen; look their names up from the data
   const dealChoices = item.deal
     ? item.deal.choiceIds
         .map((choiceId) => menuItems.find((entry) => entry.id === choiceId))
         .filter(Boolean)
     : [];
+
+  const inCart = countOfItem(lines, item.id);
+  const atLimit = inCart >= MAX_QUANTITY;
+
+  function handleAdd() {
+    const result = addItem(item);
+    setMessage(result.ok ? `Added ${item.name} to your order.` : result.message);
+  }
 
   return (
     <>
@@ -58,6 +72,23 @@ function ItemDetailsPage() {
             <dt>Allergens</dt>
             <dd>{item.allergens.length > 0 ? item.allergens.join(", ") : "None listed"}</dd>
           </dl>
+
+          {item.deal ? (
+            <p className="max-note">Deal ordering with a drink choice is added in the next stage.</p>
+          ) : (
+            <div className="order-box">
+              <button type="button" className="btn btn-primary" disabled={atLimit} onClick={handleAdd}>
+                Add to order
+              </button>
+              <p className="max-note">
+                Max {MAX_QUANTITY} per order. In your order: {inCart}.
+                {atLimit && " Limit reached."}
+              </p>
+              <p className="status" role="status">
+                {message}
+              </p>
+            </div>
+          )}
 
           {item.deal && (
             <section aria-labelledby="deal-heading">
