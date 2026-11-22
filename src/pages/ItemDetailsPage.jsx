@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { menuItems } from "../data/menuItems";
+import ItemImage from "../components/ItemImage";
 import { useCart } from "../context/useCart";
+import { useStore } from "../context/useStore";
+import OpenStatus from "../components/OpenStatus";
 import { MAX_QUANTITY } from "../utils/quantityRule";
 import { REQUIRED_CHOICES, checkDealChoice, nextSelection } from "../utils/dealRule";
-import { countOfItem } from "../utils/cartHelpers";
+import { countOfItem, makeLineId } from "../utils/cartHelpers";
 import { formatPrice } from "../utils/format";
 
 function ItemDetailsPage() {
   // useParams reads :id from the URL. URL values are text, so convert to a number.
   const { id } = useParams();
   const item = menuItems.find((entry) => entry.id === Number(id));
-  const { lines, addItem } = useCart();
-  const [message, setMessage] = useState("");
+  const { lines, addItem, setLineQuantity } = useCart();
+  const { orderingAllowed, status } = useStore();
   // Ids of the drinks picked for a deal. Starts empty: 0 of 1 selected.
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -37,14 +41,18 @@ function ItemDetailsPage() {
     : [];
 
   const inCart = countOfItem(lines, item.id);
+  // The cart line this page controls: for a deal it is the line of the chosen drink
+  const lineId = makeLineId(item.id, item.deal ? (selectedIds[0] ?? null) : null);
+  const currentLine = lines.find((line) => line.id === lineId);
+  const lineQty = currentLine ? currentLine.quantity : 0;
   const atLimit = inCart >= MAX_QUANTITY;
   // Normal items need no choice, so they always pass
   const dealCheck = item.deal ? checkDealChoice(item.deal, selectedIds) : { ok: true, message: "" };
-  const canAdd = dealCheck.ok && !atLimit;
+  const canAdd = dealCheck.ok && !atLimit && orderingAllowed;
 
   function handleAdd() {
-    const result = addItem(item, item.deal ? selectedIds[0] : null);
-    setMessage(result.ok ? `Added ${item.name} to your order.` : result.message);
+    // addItem shows the success or error message in the toast
+    addItem(item, item.deal ? selectedIds[0] : null);
   }
 
   return (
@@ -55,13 +63,7 @@ function ItemDetailsPage() {
 
       <div className="details">
         <div className="details-media">
-          {item.image ? (
-            <img src={item.image} alt={item.name} />
-          ) : (
-            <span className="card-fallback" aria-hidden="true">
-              {item.name.charAt(0)}
-            </span>
-          )}
+          <ItemImage item={item} />
         </div>
 
         <div className="details-info">
@@ -109,17 +111,59 @@ function ItemDetailsPage() {
           )}
 
           <div className="order-box">
+            <OpenStatus />
             <button type="button" className="btn btn-primary" disabled={!canAdd} onClick={handleAdd}>
+              <ShoppingCart aria-hidden="true" className="btn-icon" />
               Add to order
             </button>
-            {!dealCheck.ok && <p className="hint">{dealCheck.message}</p>}
+            {!orderingAllowed ? (
+              <p className="hint">{status.message} Use the button above to schedule an order.</p>
+            ) : (
+              !dealCheck.ok && <p className="hint">{dealCheck.message}</p>
+            )}
             <p className="max-note">
-              Max {MAX_QUANTITY} per order. In your order: {inCart}.
+              Max {MAX_QUANTITY} per order.
               {atLimit && " Limit reached."}
             </p>
-            <p className="status" role="status">
-              {message}
-            </p>
+            {lineQty > 0 ? (
+              <div className="in-cart-row">
+                <span className="in-cart-label">
+                  <ShoppingCart aria-hidden="true" />
+                  In your order
+                </span>
+                {/* - and + change the amount; the number in between is the current amount */}
+                <div className="stepper" role="group" aria-label={`Amount of ${item.name} in your order`}>
+                  <button
+                    type="button"
+                    className="stepper-btn"
+                    aria-label={`Remove one ${item.name}`}
+                    onClick={() => setLineQuantity(lineId, lineQty - 1)}
+                  >
+                    <Minus aria-hidden="true" />
+                  </button>
+                  {/* The key changes with the number, so it replays its pop animation */}
+                  <span className="stepper-value" key={lineQty} aria-live="polite">
+                    {lineQty}
+                  </span>
+                  <button
+                    type="button"
+                    className="stepper-btn"
+                    aria-label={`Add one more ${item.name}`}
+                    disabled={!canAdd}
+                    onClick={() => setLineQuantity(lineId, lineQty + 1)}
+                  >
+                    <Plus aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              inCart > 0 && (
+                <p className="in-cart" key={inCart}>
+                  <ShoppingCart aria-hidden="true" />
+                  {inCart} in your order (pick a drink to change the amount)
+                </p>
+              )
+            )}
           </div>
         </div>
       </div>

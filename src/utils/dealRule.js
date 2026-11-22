@@ -1,4 +1,5 @@
 // Rule 2 (compatibility): every deal needs exactly REQUIRED_CHOICES drink, from its own list.
+// No React code here, so the logic is easy to read and test.
 export const REQUIRED_CHOICES = 1;
 
 // Works out the new selection after the user clicks an option.

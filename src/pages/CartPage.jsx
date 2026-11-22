@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { menuItems } from "../data/menuItems";
 import { useCart } from "../context/useCart";
+import { useStore } from "../context/useStore";
+import OpenStatus from "../components/OpenStatus";
 import { MAX_QUANTITY } from "../utils/quantityRule";
 import { countOfItem, getSubtotal } from "../utils/cartHelpers";
 import { formatPrice } from "../utils/format";
 
 function CartPage() {
   const { lines, removeLine, setLineQuantity } = useCart();
+  const { orderingAllowed } = useStore();
 
   if (lines.length === 0) {
     return (
@@ -26,6 +29,7 @@ function CartPage() {
   return (
     <>
       <h1>Your order</h1>
+      <OpenStatus />
       <p className="max-note">Maximum {MAX_QUANTITY} of any one item per order.</p>
 
       <ul className="cart-list">
@@ -33,7 +37,7 @@ function CartPage() {
           const item = menuItems.find((entry) => entry.id === line.itemId);
           if (!item) return null;
           const atLimit = countOfItem(lines, line.itemId) >= MAX_QUANTITY;
-           // For deals, find the drink the customer chose
+          // For deals, find the drink the customer chose
           const choice = line.choiceId
             ? menuItems.find((entry) => entry.id === line.choiceId)
             : null;
@@ -42,7 +46,7 @@ function CartPage() {
             <li key={line.id} className="cart-line">
               <div className="cart-info">
                 <h2 className="cart-name">{item.name}</h2>
-                                {choice && item.deal && (
+                {choice && item.deal && (
                   <p className="cart-each">
                     {item.deal.choiceLabel}: {choice.name}
                   </p>
@@ -65,7 +69,7 @@ function CartPage() {
                   type="button"
                   className="btn btn-secondary qty-btn"
                   aria-label={`Increase quantity of ${item.name}`}
-                  disabled={atLimit}
+                  disabled={atLimit || !orderingAllowed}
                   onClick={() => setLineQuantity(line.id, line.quantity + 1)}
                 >
                   +

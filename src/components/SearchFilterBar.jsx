@@ -1,5 +1,7 @@
 import { CATEGORIES } from "../data/menuItems";
 
+// A controlled form: every input shows a value from state (props)
+// and reports changes back to the parent through callback props.
 function SearchFilterBar({
   query,
   onQueryChange,

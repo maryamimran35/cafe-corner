@@ -1,3 +1,5 @@
+// Pure function: takes the full menu and the current controls, returns the items to show.
+// Search, filter and sort all work together because they run in one place.
 export function getVisibleItems(items, { query, category, vegOnly, sortBy }) {
   const text = query.trim().toLowerCase();
 
@@ -9,6 +11,7 @@ export function getVisibleItems(items, { query, category, vegOnly, sortBy }) {
     return matchesText && matchesCategory && matchesVeg;
   });
 
+  // Copy the array first: sort() changes the array it is called on
   const sorted = [...filtered];
   if (sortBy === "price-asc") sorted.sort((a, b) => a.price - b.price);
   if (sortBy === "price-desc") sorted.sort((a, b) => b.price - a.price);
