@@ -1,139 +1,275 @@
 # Cafe Corner — React Business Website
 
-## Student and assignment
+## Student and Assignment
 
 - **Student:** Maryam Imran
-- **Roll number:** i242070
+- **Roll Number:** i242070
 - **Section:** CY-5A
 - **Course:** Web Programming
 - **Assignment:** Assignment 02 — Business Website Development Using React
 
-## Project overview
+## Project Overview
 
-Cafe Corner is a fictional cafe website for students and nearby customers in Islamabad. It lets visitors browse a local menu, search and filter products, view item details, customize deals, build a cart, and complete a simulated pickup or delivery order.
+Cafe Corner is a fictional cafe website based in Islamabad. It is designed for students and nearby customers who want to browse drinks, bakery products, savoury food and special deals.
 
-- **Live website:** https://cafe-corner-rosy.vercel.app
-- **GitHub repository:** https://github.com/maryamimran35/cafe-corner
-- **Deployment:** Vercel
-- **Current source commit:** `a4e1292d5174240185f334356f6a3ad5e6a4e15a`
+The website provides a complete simulated ordering experience, from browsing the menu to customizing products, managing a shopping cart and completing checkout.
 
-## Main features
+- **Live Website:** https://cafe-corner-rosy.vercel.app
+- **GitHub Repository:** https://github.com/maryamimran35/cafe-corner
+- **Deployment Platform:** Vercel
 
-- React single-page application with browser routes and a shared navigation layout.
-- 14 local menu records across Hot Drinks, Cold Drinks, Sweets & Bakery, Savoury, and Deals.
-- Search, category filter, vegetarian-only filter, and sorting by menu order, price, or name.
-- Parameterized product pages at `/items/:id`, including useful feedback for an unknown item ID.
-- Deal customization with one required, deal-specific drink choice.
-- Shared cart state with add, remove, and quantity controls.
-- Cart persistence in browser `localStorage`, with validation when saved data is restored.
-- Controlled checkout form with field-specific validation and a calculated order summary.
-- Simulated order confirmation; no real payment or server-side order processing.
-- Mock asynchronous menu loading, loading/error/empty states, and retry controls.
-- Footer demo controls for simulating store time and menu-load outcomes.
-- Responsive layout and semantic, keyboard-accessible controls.
+## Main Features
 
-## Business profile
+- Responsive React single-page application.
+- 14 local menu records across five categories.
+- Product search, category filtering, vegetarian filtering and sorting.
+- Individual product detail pages.
+- Deal customization with required drink selections.
+- Shopping cart with add, remove and quantity controls.
+- Cart persistence using browser localStorage.
+- Validation of saved cart data when restored.
+- Controlled checkout form with field-specific validation.
+- Automatic subtotal, delivery fee and total calculation.
+- Simulated order confirmation.
+- Asynchronous mock menu loading.
+- Loading, error, retry and empty-menu states.
+- Demonstration controls for testing loading failures, store hours and changed menu availability.
+- Cart recovery when a previously selected product becomes unavailable.
+- Keyboard-accessible controls and responsive layouts.
 
-Cafe Corner is a fictional cafe at Shop 4, Student Plaza, H-11 Markaz, Islamabad. Its intended audience is students and nearby customers looking for drinks, bakery items, savoury food, and value deals. The app demonstrates browsing and a simulated order journey. It does not connect to a live restaurant, payment gateway, or delivery service.
+## Business Profile
 
-## Operating rules
+Cafe Corner is a fictional cafe located at Shop 4, Student Plaza, H-11 Markaz, Islamabad.
 
-1. **Item quantity / capacity:** A customer may order from 1 to 10 units of a menu item in one order. A quantity above 10 is rejected. Implemented in `src/utils/quantityRule.js` and enforced in `src/context/CartProvider.jsx`.
-2. **Deal compatibility:** Each deal requires exactly one drink selected from that deal's allowed drink IDs. The Study Break Deal allows the listed hot drinks; Burger Combo allows the listed cold drinks. Invalid or missing choices cannot be added or placed. Implemented in `src/utils/dealRule.js`, `src/pages/ItemDetailsPage.jsx`, and `src/context/CartProvider.jsx`.
-3. **Opening / fulfilment:** Orders are accepted from 9:00 AM through 10:30 PM inclusive. When closed, normal ordering is blocked and the next opening is shown. A customer can explicitly schedule for the next opening. Implemented in `src/data/storeInfo.js`, `src/utils/openingRule.js`, `src/context/StoreProvider.jsx`, `src/components/OpenStatus.jsx`, and `src/context/CartProvider.jsx`.
+Its intended customers are students and nearby residents looking for coffee, cold drinks, bakery products, savoury food and affordable deals.
 
-### Delivery and pickup pricing
+The application demonstrates a simulated ordering process. It does not connect to a real restaurant, payment gateway or delivery service.
 
-- Pickup fee: Rs 0.
-- Delivery fee: Rs 150 when the food subtotal is below Rs 1,000.
-- Delivery fee: Rs 0 when the food subtotal is Rs 1,000 or more (including exactly Rs 1,000).
-- Delivery areas are H-10, H-11, H-12, I-8, I-9, I-10, and I-11.
-- Pricing logic is in `src/utils/feeRules.js`; delivery form validation is in `src/utils/checkoutValidation.js`.
+## Operating Rules
 
-## Routes
+### 1. Item Quantity and Capacity
+
+Customers can order between 1 and 10 units of an individual menu item. Quantities above 10 are rejected.
+
+**Implementation:**
+- `src/utils/quantityRule.js`
+- `src/context/CartProvider.jsx`
+
+### 2. Deal Compatibility
+
+Each deal requires exactly one drink selected from its allowed drink IDs.
+
+- Study Break Deal uses its permitted hot drinks.
+- Burger Combo uses its permitted cold drinks.
+- Missing or invalid selections cannot be added or placed.
+- Customers can change or reselect their drink.
+
+**Implementation:**
+- `src/utils/dealRule.js`
+- `src/pages/ItemDetailsPage.jsx`
+- `src/context/CartProvider.jsx`
+
+### 3. Store Opening and Fulfilment
+
+The store accepts orders from 9:00 AM through 10:30 PM, inclusive.
+
+When the store is closed:
+- Normal ordering is blocked.
+- The next opening time is displayed.
+- Customers can schedule an order for the next opening.
+
+**Implementation:**
+- `src/data/storeInfo.js`
+- `src/utils/openingRule.js`
+- `src/context/StoreProvider.jsx`
+- `src/components/OpenStatus.jsx`
+- `src/context/CartProvider.jsx`
+
+## Delivery and Pickup Pricing
+
+| Order type | Fee |
+|---|---:|
+| Pickup | Rs 0 |
+| Delivery below Rs 1,000 | Rs 150 |
+| Delivery of Rs 1,000 or more | Free |
+
+The free-delivery threshold includes an exact subtotal of Rs 1,000.
+
+Delivery areas include H-10, H-11, H-12, I-8, I-9, I-10 and I-11.
+
+**Implementation:**
+- `src/utils/feeRules.js`
+- `src/utils/checkoutValidation.js`
+
+## Application Routes
 
 | Route | Purpose |
 |---|---|
-| `/` | Menu browsing, search, filters, and sorting |
-| `/items/:id` | Menu item details and deal choices |
-| `/cart` | Review, change, or remove cart items |
+| `/` | Menu browsing, search, filtering and sorting |
+| `/items/:id` | Product details and deal customization |
+| `/cart` | Review and manage cart items |
 | `/checkout` | Enter order details and review totals |
-| `/confirmation` | Show the latest simulated order confirmation |
+| `/confirmation` | Display simulated order confirmation |
 | `/contact` | Cafe contact information |
-| `*` | Not-found page for unknown routes |
+| `*` | Not-found page |
 
-The app uses React Router. `vercel.json` rewrites requests to `index.html` so direct navigation and refresh on nested routes work on Vercel.
+The application uses React Router. Vercel routing configuration supports direct navigation and refreshing nested routes.
 
-## Technology
+## Technology Stack
 
 - React 19
 - Vite
 - React Router
-- lucide-react icons
-- JavaScript and CSS
-- Node.js built-in test runner (`node:test`) and assertions (`node:assert/strict`)
+- JavaScript
+- CSS
+- lucide-react
+- Node.js built-in test runner (`node:test`)
+- Node.js assertions (`node:assert/strict`)
 
-## Run locally
+## Installation and Local Development
 
-Use Node.js and npm. From the project root:
+### Requirements
+
+- Node.js
+- npm
+
+### Installation
+
+Clone the repository:
 
 ```bash
+git clone https://github.com/maryamimran35/cafe-corner.git
+cd cafe-corner
 npm install
+```
+
+### Start the development server
+
+```bash
 npm run dev
 ```
 
-Vite prints the local development URL in the terminal (normally `http://localhost:5173`).
+Vite displays the local development URL in the terminal, normally `http://localhost:5173`.
 
-## Build, lint, and test
+## Build, Lint and Test
+
+Build the production application:
 
 ```bash
 npm run build
+```
+
+Run ESLint:
+
+```bash
 npm run lint
+```
+
+Run automated tests:
+
+```bash
 npm test
 ```
 
-To preview a production build locally:
+Preview the production build locally:
 
 ```bash
-npm run build
 npm run preview
 ```
 
-The quantity rule tests are in `src/utils/quantityRule.test.js`. They cover a valid quantity, the exact maximum of 10, and a quantity above the maximum. **Verification performed for this documentation update:** `npm test` completed with 3 tests passed and 0 failed. Run the commands again on the final submitted copy.
+The quantity-rule tests are located in `src/utils/quantityRule.test.js`.
 
-## Demonstrating edge cases
+They check:
+- A normal valid quantity.
+- The maximum permitted quantity of 10.
+- Rejection of a quantity above 10.
 
-- **Quantity limit:** Open an item and increase its quantity to 10; another increase should be blocked.
-- **Deal choice:** Open Study Break Deal or Burger Combo. Try adding with no drink selected, select one allowed drink, deselect it, and select it again. Exactly one valid choice is required.
-- **Store hours:** Open the footer's **Demo controls (for testing only)**. Set a time before 09:00 or after 22:30 to show the closed state and next opening. Set 09:00 and 22:30 to check the inclusive boundaries.
-- **Menu loading:** In the same demo controls, choose **Fails** and select **Reload menu now** to show the error/retry state. Choose **Works normally** to load the menu again. Choose **Returns an empty menu** to show the empty-data state.
-- **Search with no matches:** Search for a term that is not in the menu; clear the search and filters to restore the menu.
-- **Invalid item URL:** Open `/items/999999` to see the item-not-found message and return link.
-- **Cart persistence:** Add an item, refresh the browser, and check that the cart is restored. The app revalidates saved cart entries against the current menu and rules.
-- **Checkout validation:** Submit an incomplete form. Correct the displayed fields and check that valid entries remain in the form. Delivery requires an allowed area and street/house details.
-- **Nested-route hosting:** Open `/items/1`, `/cart`, and `/checkout` directly on the deployed site and refresh each page.
+## Demonstrating Edge Cases
 
-## Code map: React and JavaScript concepts
+The footer contains labelled demonstration controls for testing different application states.
 
-| Concept / responsibility | Main files |
+### Quantity Limit
+
+Increase an item's quantity to 10. Further increases should be blocked.
+
+### Deal Compatibility
+
+Open a deal and try adding it without selecting a drink. Select one valid drink, deselect it and select it again. The deal must contain exactly one valid drink.
+
+### Store Opening Hours
+
+Use the footer's demonstration controls to simulate different times.
+
+Test:
+- 08:59 — closed.
+- 09:00 — open.
+- 22:30 — open.
+- 22:31 — closed.
+
+### Menu Loading
+
+Use the demonstration controls to simulate:
+- A successful menu load.
+- A loading failure with retry.
+- An empty menu response.
+
+### Changed Menu Availability
+
+Use the demonstration option **Spanish Latte is no longer available** and reload the menu.
+
+If Spanish Latte is already saved in the cart, the application revalidates the saved selection, removes the unavailable item and displays an update notification.
+
+Restore normal menu availability using the demonstration controls.
+
+### Search With No Results
+
+Search for a term that does not exist in the menu. The application displays a no-matching-results message.
+
+### Invalid Product URL
+
+Open `/items/999999` to display the item-not-found message.
+
+### Cart Persistence
+
+Add an item to the cart and refresh the browser. The application restores saved cart data and checks it against current menu availability and business rules.
+
+### Checkout Validation
+
+Submit an incomplete checkout form and review the field-specific validation messages. Correct the fields and verify that valid information remains available.
+
+### Nested Route Refresh
+
+Directly open and refresh:
+- `/items/1`
+- `/cart`
+- `/checkout`
+
+These routes should load correctly on the deployed website.
+
+## React and JavaScript Concept Map
+
+| Concept | Main files |
 |---|---|
 | Application routes and layout | `src/App.jsx`, `src/components/Layout.jsx` |
-| Reusable UI components and props | `src/components/` |
+| Reusable components and props | `src/components/` |
 | Local menu data and stable IDs | `src/data/menuItems.js` |
-| Shared state with Context and hooks | `src/context/MenuProvider.jsx`, `src/context/CartProvider.jsx`, `src/context/StoreProvider.jsx` |
-| Search, filter, and sort using array methods | `src/utils/menuFilters.js`, `src/pages/MenuPage.jsx` |
-| Quantity and deal business rules | `src/utils/quantityRule.js`, `src/utils/dealRule.js` |
+| Shared state and React Context | `src/context/` |
+| Search, filtering and sorting | `src/utils/menuFilters.js`, `src/pages/MenuPage.jsx` |
+| Quantity and deal rules | `src/utils/quantityRule.js`, `src/utils/dealRule.js` |
 | Opening-hours rule | `src/utils/openingRule.js`, `src/data/storeInfo.js` |
-| Delivery fee and calculated totals | `src/utils/feeRules.js`, `src/components/OrderTotals.jsx` |
-| Form state and validation | `src/pages/CheckoutPage.jsx`, `src/utils/checkoutValidation.js` |
-| Persistence and restoration | `src/utils/cartStorage.js`, `src/context/CartProvider.jsx` |
-| Async mock loading and retry | `src/services/menuService.js`, `src/context/MenuProvider.jsx` |
-| Automated rule tests | `src/utils/quantityRule.test.js` |
+| Delivery fees and totals | `src/utils/feeRules.js`, `src/components/OrderTotals.jsx` |
+| Checkout validation | `src/pages/CheckoutPage.jsx`, `src/utils/checkoutValidation.js` |
+| Cart persistence | `src/utils/cartStorage.js`, `src/context/CartProvider.jsx` |
+| Asynchronous menu loading | `src/services/menuService.js`, `src/context/MenuProvider.jsx` |
+| Automated tests | `src/utils/quantityRule.test.js` |
 
-## Limitations
+## Project Limitations
 
-- Menu records and images are local project assets; there is no live backend or database.
-- Menu loading is simulated with a Promise and delay; it is not a real network request.
-- Cart data is stored in the current browser's local storage and is not synchronized between devices.
-- Checkout and confirmation simulate an order only. No payment is collected and no real order is sent to a restaurant.
-- The contact details and business are fictional demonstration data.
+- Menu records and images are stored locally.
+- There is no live backend or database.
+- Menu loading is simulated using a Promise and delay.
+- Cart information is stored in the current browser's localStorage and is not synchronized across devices.
+- Checkout and order confirmation are simulated.
+- No real payment is collected.
+- No real restaurant order or delivery request is submitted.
+- Cafe Corner and its contact details are fictional demonstration data.
