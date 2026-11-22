@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CartContext } from "./cartContext";
 import { useStore } from "./useStore";
 import { checkQuantity } from "../utils/quantityRule";
@@ -9,6 +9,9 @@ import { restoreCart } from "../utils/cartStorage";
 import { useMenu } from "./useMenu";
 
 
+// Local storage key for the saved cart
+const CART_KEY = "cafe-corner-cart";
+
 function CartProvider({ children }) {
   const { orderingAllowed, status, setScheduled } = useStore();
   const { items: menuItems, status: menuStatus } = useMenu();
@@ -18,24 +21,32 @@ function CartProvider({ children }) {
   const [notice, setNotice] = useState(null);
 
 
+  // Always holds the newest cart, so the menu-check effect below can read it without re-running on every change
+  const linesRef = useRef(lines);
   useEffect(() => {
-    if (menuStatus !== "ready" || cartReady) return;
+    linesRef.current = lines;
+  }, [lines]);
+  // The menu array that the cart was last checked against
+  const checkedMenuRef = useRef(null);
 
+  // First load: restore the saved cart from local storage.
+  // Later loads (for example when availability changes): re-check the cart in memory.
+  // Both read an outside system, so setState inside this effect is intended.
+  useEffect(() => {
+    if (menuStatus !== "ready" || checkedMenuRef.current === menuItems) return;
+    // An empty menu is "no data", not "everything sold out": keep the cart as it is
+    if (menuItems.length === 0) return;
+
+    const firstLoad = checkedMenuRef.current === null;
+    checkedMenuRef.current = menuItems;
+
+    let cartText = null;
     try {
-      const savedCart = window.localStorage.getItem("cafe-corner-cart");
-      if (savedCart) {
-        const restored = restoreCart(savedCart, menuItems);
-        setLines(restored.lines);
-
-        if (restored.conflicts.length > 0) {
-          setNotice({
-            id: Date.now(),
-            type: "error",
-            text: `Some saved items could not be restored: ${restored.conflicts.join(" ")}`,
-          });
-        }
-      }
+      cartText = firstLoad
+        ? window.localStorage.getItem(CART_KEY)
+        : JSON.stringify(linesRef.current);
     } catch {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotice({
         id: Date.now(),
         type: "error",
@@ -43,19 +54,35 @@ function CartProvider({ children }) {
       });
     }
 
+    if (cartText) {
+      const restored = restoreCart(cartText, menuItems);
+      setLines(restored.lines);
+
+      if (restored.conflicts.length > 0) {
+        setNotice({
+          id: Date.now(),
+          type: "error",
+          persist: true,
+          text: `Your order was updated: ${restored.conflicts.join(" ")}`,
+        });
+      }
+    }
+
     setCartReady(true);
-  }, [menuStatus, cartReady, menuItems]);
+  }, [menuStatus, menuItems]);
 
   useEffect(() => {
     if (!cartReady) return;
 
     try {
       if (lines.length === 0) {
-        window.localStorage.removeItem("cafe-corner-cart");
+        window.localStorage.removeItem(CART_KEY);
       } else {
-        window.localStorage.setItem("cafe-corner-cart", JSON.stringify(lines));
+        window.localStorage.setItem(CART_KEY, JSON.stringify(lines));
       }
     } catch {
+      // Saving is only a convenience, so the cart keeps working and the customer is told
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotice({
         id: Date.now(),
         type: "error",

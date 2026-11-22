@@ -27,13 +27,14 @@ function Footer() {
           </div>
           <p>{simulatedTime ? `Using simulated time ${simulatedTime}.` : "Using the real time."}</p>
 
-          <p>Try the loading states: pick what the next menu load does, then reload it.</p>
+          <p>Try the loading states and changed availability: pick what the next menu load does, then reload it. Items already in your cart are checked against the new menu.</p>
           <div className="demo-row">
             <label htmlFor="demo-menu">Next menu load</label>
             <select id="demo-menu" value={demoMode} onChange={(event) => chooseDemoMode(event.target.value)}>
               <option value="normal">Works normally</option>
               <option value="fail">Fails</option>
               <option value="empty">Returns an empty menu</option>
+              <option value="changed">Spanish Latte is no longer available</option>
             </select>
             <button type="button" className="btn btn-secondary" onClick={reload}>
               Reload menu now

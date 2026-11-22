@@ -46,6 +46,12 @@ export function restoreCart(savedText, menuItems) {
 
     const choiceId = savedLine.choiceId ?? null;
 
+    // A saved drink that has since left the menu is a conflict, even if the deal still lists it
+    if (choiceId !== null && !menuItems.some((entry) => entry.id === choiceId)) {
+      conflicts.push(`${item.name} was removed because its chosen drink is no longer available.`);
+      continue;
+    }
+
     if (item.deal) {
       const choiceCheck = checkDealChoice(
         item.deal,

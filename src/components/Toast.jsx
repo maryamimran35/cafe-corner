@@ -8,7 +8,8 @@ function Toast() {
   const { notice, clearNotice } = useCart();
 
   useEffect(() => {
-    if (!notice) return undefined;
+    // Messages about removed cart items stay until the customer dismisses them
+    if (!notice || notice.persist) return undefined;
     const timer = setTimeout(clearNotice, 4000);
     return () => clearTimeout(timer);
   }, [notice, clearNotice]);
