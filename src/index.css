@@ -676,3 +676,12 @@ html { scroll-padding-top: 88px; } /* focused or linked content is never hidden 
 .confirm-title { display: flex; align-items: center; gap: 10px; color: #1e6b3a; }
 .confirm-title svg { width: 34px; height: 34px; }
 .confirm-title:focus { outline: none; }
+
+/* ===== Loading and error states, demo select ===== */
+.loading-box { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 16px; color: var(--muted); }
+.spinner { width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
+.error-box { background: #fdecea; border: 2px solid #b3261e; border-radius: var(--radius); padding: 24px; margin-top: 16px; }
+.error-box h1 { font-size: 1.5rem; color: #b3261e; }
+.demo-row select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid #b9a691; }

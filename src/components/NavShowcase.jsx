@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Coffee, Croissant, GlassWater, Pause, Play, Sandwich, Star } from "lucide-react";
-import { CATEGORIES, menuItems } from "../data/menuItems";
+import { CATEGORIES } from "../data/menuItems";
+import { useMenu } from "../context/useMenu";
 import { formatPrice } from "../utils/format";
 import ItemImage from "./ItemImage";
 
@@ -13,18 +14,22 @@ const CATEGORY_ICONS = {
   Deals: Star,
 };
 
-// Built once from the same data as the menu page, so it can never show a product
-// that is missing from the menu: [{ name, items: [...] }, ...]
-const GROUPS = CATEGORIES.map((name) => ({
-  name,
-  items: menuItems.filter((item) => item.category === name),
-})).filter((group) => group.items.length > 0);
-
 const SLIDE_MS = 2500;
 
 // Static showcase under the top bar. Left: short intro. Middle: categories.
 // Right: a display that steps through the products of one category, then moves to the next category.
 function NavShowcase() {
+  const { items } = useMenu();
+  // Built from the loaded menu, so it can never show a product that is missing from it:
+  // [{ name, items: [...] }, ...]
+  const groups = useMemo(
+    () =>
+      CATEGORIES.map((name) => ({
+        name,
+        items: items.filter((item) => item.category === name),
+      })).filter((entry) => entry.items.length > 0),
+    [items],
+  );
   // One state object, so the "next product / next category" step is a single functional update
   const [position, setPosition] = useState({ category: 0, product: 0 });
   // Paused by the mouse or keyboard being inside the panel
@@ -35,22 +40,23 @@ function NavShowcase() {
   );
 
   const paused = hovering || userPaused;
-  const group = GROUPS[position.category];
+  // groups can change (for example after a reload), so fall back to the first one
+  const group = groups[position.category] ?? groups[0];
 
   useEffect(() => {
-    if (paused) return undefined;
+    if (paused || groups.length === 0) return undefined;
     const timer = setTimeout(() => {
       setPosition((previous) => {
-        const current = GROUPS[previous.category];
+        const current = groups[previous.category] ?? groups[0];
         if (previous.product < current.items.length - 1) {
           return { ...previous, product: previous.product + 1 };
         }
-        return { category: (previous.category + 1) % GROUPS.length, product: 0 };
+        return { category: (previous.category + 1) % groups.length, product: 0 };
       });
     }, SLIDE_MS);
     // Cleanup: cancel the timer if the position or pause state changes first
     return () => clearTimeout(timer);
-  }, [paused, position]);
+  }, [paused, position, groups]);
 
   function previewCategory(index) {
     setPosition({ category: index, product: 0 });
@@ -60,6 +66,9 @@ function NavShowcase() {
   function handleBlur(event) {
     if (!event.currentTarget.contains(event.relatedTarget)) setHovering(false);
   }
+
+  // Nothing to show while the menu is loading, failed, or empty
+  if (!group) return null;
 
   const CategoryIcon = CATEGORY_ICONS[group.name];
 
@@ -84,7 +93,7 @@ function NavShowcase() {
         <nav className="showcase-categories" aria-label="Menu categories">
           <p className="showcase-eyebrow">EXPLORE CATEGORIES</p>
           <ul className="showcase-category-list">
-            {GROUPS.map((entry, index) => {
+            {groups.map((entry, index) => {
               const Icon = CATEGORY_ICONS[entry.name];
               return (
                 <li key={entry.name}>

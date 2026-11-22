@@ -1,7 +1,9 @@
 import { useStore } from "../context/useStore";
+import { useMenu } from "../context/useMenu";
 
 function Footer() {
   const { simulatedTime, setSimulatedTime } = useStore();
+  const { demoMode, chooseDemoMode, reload } = useMenu();
 
   return (
     <footer className="site-footer">
@@ -26,6 +28,19 @@ function Footer() {
             </button>
           </div>
           <p>{simulatedTime ? `Using simulated time ${simulatedTime}.` : "Using the real time."}</p>
+
+          <p>Try the loading states: pick what the next menu load does, then reload it.</p>
+          <div className="demo-row">
+            <label htmlFor="demo-menu">Next menu load</label>
+            <select id="demo-menu" value={demoMode} onChange={(event) => chooseDemoMode(event.target.value)}>
+              <option value="normal">Works normally</option>
+              <option value="fail">Fails</option>
+              <option value="empty">Returns an empty menu</option>
+            </select>
+            <button type="button" className="btn btn-secondary" onClick={reload}>
+              Reload menu now
+            </button>
+          </div>
         </details>
       </div>
     </footer>

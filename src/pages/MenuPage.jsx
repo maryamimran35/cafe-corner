@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CATEGORIES, menuItems } from "../data/menuItems";
+import { CATEGORIES } from "../data/menuItems";
+import { useMenu } from "../context/useMenu";
 import { getVisibleItems } from "../utils/menuFilters";
 import ItemCard from "../components/ItemCard";
 import SearchFilterBar from "../components/SearchFilterBar";
 import OpenStatus from "../components/OpenStatus";
 
 function MenuPage() {
+  const { items: menuItems, reload } = useMenu();
   // The four controls live here, so the list and the bar always agree
   const [query, setQuery] = useState("");
   // The navbar dropdown links here with ?category=Hot%20Drinks, so start with that category
@@ -24,6 +26,22 @@ function MenuPage() {
     setCategory("All");
     setVegOnly(false);
     setSortBy("menu");
+  }
+
+  // Empty dataset: there is nothing to search, which is different from a search with no matches
+  if (menuItems.length === 0) {
+    return (
+      <>
+        <h1>Our Menu</h1>
+        <div className="empty-state">
+          <h2>The menu is empty right now</h2>
+          <p>We have no items to show at the moment. Nothing is wrong with your search. Please try again shortly.</p>
+          <button type="button" className="btn btn-primary" onClick={reload}>
+            Reload the menu
+          </button>
+        </div>
+      </>
+    );
   }
 
   return (

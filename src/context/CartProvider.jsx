@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { CartContext } from "./cartContext";
 import { useStore } from "./useStore";
-import { menuItems } from "../data/menuItems";
+import { useMenu } from "./useMenu";
 import { checkQuantity } from "../utils/quantityRule";
 import { checkDealChoice } from "../utils/dealRule";
 import { buildOrderLines, countOfItem, getCartCount, getSubtotal, makeLineId } from "../utils/cartHelpers";
@@ -12,6 +12,7 @@ import { getOrderTotals } from "../utils/feeRules";
 
 function CartProvider({ children }) {
   const { orderingAllowed, status, setScheduled } = useStore();
+  const { items: menuItems } = useMenu();
   const [lines, setLines] = useState([]);
   // The last order that was placed, kept so the confirmation page can show it
   const [lastOrder, setLastOrder] = useState(null);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { menuItems } from "../data/menuItems";
+import { useMenu } from "../context/useMenu";
 import { STORE } from "../data/storeInfo";
 import { useCart } from "../context/useCart";
 import OpenStatus from "../components/OpenStatus";
@@ -15,6 +15,7 @@ const EMPTY_FORM = { name: "", phone: "", method: "pickup", area: "", address: "
 function CheckoutPage() {
   const navigate = useNavigate();
   const { lines, placeOrder } = useCart();
+  const { items: menuItems } = useMenu();
   // One object holds every field. Each change copies it, so state is never changed in place.
   const [form, setForm] = useState(EMPTY_FORM);
   // Fields the customer has already left, so errors do not appear while they are still typing for the first time

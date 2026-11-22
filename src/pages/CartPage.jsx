@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { menuItems } from "../data/menuItems";
+import { useMenu } from "../context/useMenu";
 import { useCart } from "../context/useCart";
 import { useStore } from "../context/useStore";
 import OpenStatus from "../components/OpenStatus";
@@ -10,6 +10,7 @@ import { DELIVERY_FEE, amountToFreeDelivery } from "../utils/feeRules";
 
 function CartPage() {
   const { lines, removeLine, setLineQuantity } = useCart();
+  const { items: menuItems } = useMenu();
   const { orderingAllowed } = useStore();
 
   if (lines.length === 0) {

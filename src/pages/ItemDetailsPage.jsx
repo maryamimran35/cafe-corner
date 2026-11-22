@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
-import { menuItems } from "../data/menuItems";
+import { useMenu } from "../context/useMenu";
 import ItemImage from "../components/ItemImage";
 import { useCart } from "../context/useCart";
 import { useStore } from "../context/useStore";
@@ -14,6 +14,7 @@ import { formatPrice } from "../utils/format";
 function ItemDetailsPage() {
   // useParams reads :id from the URL. URL values are text, so convert to a number.
   const { id } = useParams();
+  const { items: menuItems } = useMenu();
   const item = menuItems.find((entry) => entry.id === Number(id));
   const { lines, addItem, setLineQuantity } = useCart();
   const { orderingAllowed, status } = useStore();
