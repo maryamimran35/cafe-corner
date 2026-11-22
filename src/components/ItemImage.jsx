@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-// Shows the item photo. If the item has no photo, or the file fails to load,
-// a designed fallback (the first letter of the name) is shown instead.
 function ItemImage({ item }) {
   const [failed, setFailed] = useState(false);
 

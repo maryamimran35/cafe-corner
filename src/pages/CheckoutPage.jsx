@@ -102,7 +102,7 @@ function CheckoutPage() {
     <>
       <h1>Checkout</h1>
       <p className="demo-note">
-        Demo only: nothing is sent or charged. Please use made-up details (for example Ali Test, 0300 0000000).
+        Use testing data.
       </p>
       <OpenStatus />
 
@@ -195,7 +195,7 @@ function CheckoutPage() {
 
           <div className="checkout-actions">
             <button type="submit" className="btn btn-primary">
-              Place order (simulated)
+              Place order
             </button>
             <Link className="btn btn-secondary" to="/cart">
               Back to your order

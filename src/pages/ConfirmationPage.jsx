@@ -35,7 +35,6 @@ function ConfirmationPage() {
         <CircleCheck aria-hidden="true" />
         Order placed
       </h1>
-      <p className="demo-note">This is a simulated order. Nothing was sent, prepared or charged.</p>
 
       <section className="summary-box" aria-labelledby="confirm-heading">
         <h2 id="confirm-heading">Order {lastOrder.number}</h2>

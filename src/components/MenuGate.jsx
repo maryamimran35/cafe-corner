@@ -1,7 +1,5 @@
 import { useMenu } from "../context/useMenu";
 
-// Wraps a page that needs the menu. It shows a loading message or an error with a Try again button,
-// and only shows the page itself once the menu is ready.
 function MenuGate({ children }) {
   const { status, error, reload } = useMenu();
 

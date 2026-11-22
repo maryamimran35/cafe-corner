@@ -1,8 +1,6 @@
 import { formatPrice } from "../utils/format";
 import { FREE_DELIVERY_FROM } from "../utils/feeRules";
 
-// Lines + totals of an order. It only shows what it is given (props), so the checkout page
-// and the confirmation page use the same component.
 function OrderTotals({ lines, totals }) {
   return (
     <>

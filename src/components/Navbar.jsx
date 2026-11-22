@@ -5,12 +5,10 @@ import { useCart } from "../context/useCart";
 import { getCartCount } from "../utils/cartHelpers";
 import { useHideOnScroll } from "../hooks/useHideOnScroll";
 
-// Slim top bar on every page. It is sticky: it hides while scrolling down and returns when scrolling up.
 function Navbar() {
   const { lines } = useCart();
   const count = getCartCount(lines);
   const scrollingDown = useHideOnScroll();
-  // Keyboard users: while focus is inside the bar it must stay visible
   const [focusInside, setFocusInside] = useState(false);
   const hidden = scrollingDown && !focusInside;
 
@@ -55,7 +53,6 @@ function Navbar() {
           >
             <ShoppingCart aria-hidden="true" />
             <span>Cart</span>
-            {/* The key changes with the count, so the badge replays its pop animation */}
             {count > 0 && (
               <span className="badge" key={count} aria-hidden="true">
                 {count}

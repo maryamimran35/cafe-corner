@@ -35,7 +35,6 @@ function ContactPage() {
           <Phone aria-hidden="true" className="info-icon" />
           <h2 id="call-heading">Call us</h2>
           <p>{STORE.phone}</p>
-          <p>This is a student project, so these details are made up.</p>
         </section>
       </div>
     </>

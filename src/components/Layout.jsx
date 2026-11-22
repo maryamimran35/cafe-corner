@@ -10,12 +10,9 @@ function Layout() {
   return (
     <>
       <Navbar />
-      {/* The big showcase belongs to the front page only */}
       {location.pathname === "/" && <NavShowcase />}
       <main className="container page">
-        {/* The key changes with the URL (path and ?category=...), so each new page plays the fade-in animation */}
         <div key={location.pathname + location.search} className="page-enter">
-          {/* Outlet shows whichever page matches the current URL */}
           <Outlet />
         </div>
       </main>

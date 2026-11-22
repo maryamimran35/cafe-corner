@@ -16,12 +16,8 @@ const CATEGORY_ICONS = {
 
 const SLIDE_MS = 2500;
 
-// Static showcase under the top bar. Left: short intro. Middle: categories.
-// Right: a display that steps through the products of one category, then moves to the next category.
 function NavShowcase() {
   const { items } = useMenu();
-  // Built from the loaded menu, so it can never show a product that is missing from it:
-  // [{ name, items: [...] }, ...]
   const groups = useMemo(
     () =>
       CATEGORIES.map((name) => ({
@@ -30,17 +26,13 @@ function NavShowcase() {
       })).filter((entry) => entry.items.length > 0),
     [items],
   );
-  // One state object, so the "next product / next category" step is a single functional update
   const [position, setPosition] = useState({ category: 0, product: 0 });
-  // Paused by the mouse or keyboard being inside the panel
   const [hovering, setHovering] = useState(false);
-  // Paused by the Pause button. Starts paused for people who asked their device for less motion.
   const [userPaused, setUserPaused] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
 
   const paused = hovering || userPaused;
-  // groups can change (for example after a reload), so fall back to the first one
   const group = groups[position.category] ?? groups[0];
 
   useEffect(() => {
@@ -54,7 +46,6 @@ function NavShowcase() {
         return { category: (previous.category + 1) % groups.length, product: 0 };
       });
     }, SLIDE_MS);
-    // Cleanup: cancel the timer if the position or pause state changes first
     return () => clearTimeout(timer);
   }, [paused, position, groups]);
 
@@ -62,12 +53,10 @@ function NavShowcase() {
     setPosition({ category: index, product: 0 });
   }
 
-  // Keyboard users: stay paused while focus is anywhere inside the panel
   function handleBlur(event) {
     if (!event.currentTarget.contains(event.relatedTarget)) setHovering(false);
   }
 
-  // Nothing to show while the menu is loading, failed, or empty
   if (!group) return null;
 
   const CategoryIcon = CATEGORY_ICONS[group.name];

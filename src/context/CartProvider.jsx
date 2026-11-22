@@ -8,23 +8,16 @@ import { getOrderTotals } from "../utils/feeRules";
 import { restoreCart } from "../utils/cartStorage";
 import { useMenu } from "./useMenu";
 
-// A cart line is { id, itemId, choiceId, quantity }.
-// choiceId is for deals (the chosen drink); it is null for normal items.
 
 function CartProvider({ children }) {
   const { orderingAllowed, status, setScheduled } = useStore();
   const { items: menuItems, status: menuStatus } = useMenu();
   const [lines, setLines] = useState([]);
-  // Do not save an empty cart before the saved cart has had a chance to load.
   const [cartReady, setCartReady] = useState(false);
-  // The last order that was placed, kept so the confirmation page can show it
   const [lastOrder, setLastOrder] = useState(null);
-  // notice = the message shown in the toast, e.g. { id, type: "success", text, count }
   const [notice, setNotice] = useState(null);
 
 
-  // Restore the cart only after the menu has loaded. This lets us check that every
-  // saved item and every saved deal choice still exists in the current menu.
   useEffect(() => {
     if (menuStatus !== "ready" || cartReady) return;
 
@@ -53,8 +46,6 @@ function CartProvider({ children }) {
     setCartReady(true);
   }, [menuStatus, cartReady, menuItems]);
 
-  // Save every cart change. The cartReady check prevents the initial empty state
-  // from overwriting the customer's saved cart during the menu-loading stage.
   useEffect(() => {
     if (!cartReady) return;
 
@@ -73,14 +64,12 @@ function CartProvider({ children }) {
     }
   }, [lines, cartReady]);
 
-  // useCallback keeps the same function between renders, so the Toast timer is not reset
   const clearNotice = useCallback(() => setNotice(null), []);
 
   function showError(message) {
     setNotice({ id: Date.now(), type: "error", text: message });
   }
 
-  // Each action returns { ok, message } so the screen can tell the user what happened.
   function addItem(item, choiceId = null) {
     // Rule 3: nothing can be added while the store is closed (unless the order is scheduled)
     if (!orderingAllowed) {
@@ -105,7 +94,6 @@ function CartProvider({ children }) {
     }
 
     const lineId = makeLineId(item.id, choiceId);
-    // Functional update: the new list is built from the previous one, without changing it
     setLines((previous) => {
       const exists = previous.some((line) => line.id === lineId);
       if (exists) {
@@ -161,8 +149,6 @@ function CartProvider({ children }) {
     return check;
   }
 
-  // Final check when the customer presses "Place order". Every rule is checked again here,
-  // so an order can never be completed with a broken cart. Returns { ok, message, order }.
   function placeOrder(details) {
     const fail = (message) => ({ ok: false, message });
 
@@ -189,7 +175,6 @@ function CartProvider({ children }) {
       details,
       lines: buildOrderLines(lines, menuItems),
       count: getCartCount(lines),
-      // Filled only when the shop was closed and the customer scheduled the order
       scheduledFor: status.open ? "" : status.nextOpenLabel,
       ...totals,
     };

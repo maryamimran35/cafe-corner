@@ -3,8 +3,6 @@ import { STORE } from "../data/storeInfo";
 import { formatTime } from "../utils/format";
 import { useStore } from "../context/useStore";
 
-// Tells the customer whether we are open BEFORE they start building an order.
-// The words (Open / Closed / Scheduled) carry the meaning; the colour only backs them up.
 function OpenStatus() {
   const { status, scheduled, setScheduled } = useStore();
 

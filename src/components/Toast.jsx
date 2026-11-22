@@ -7,8 +7,6 @@ import { useCart } from "../context/useCart";
 function Toast() {
   const { notice, clearNotice } = useCart();
 
-  // Hide the toast after 4 seconds. The cleanup function cancels the timer
-  // if a newer notice arrives first, so an old timer never hides a new message.
   useEffect(() => {
     if (!notice) return undefined;
     const timer = setTimeout(clearNotice, 4000);
@@ -17,7 +15,6 @@ function Toast() {
 
   const isSuccess = notice && notice.type === "success";
 
-  // The region stays on the page so screen readers announce each new message
   return (
     <div className="toast-region" role="status" aria-live="polite">
       {notice && (

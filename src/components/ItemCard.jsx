@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 import ItemImage from "./ItemImage";
 import { formatPrice } from "../utils/format";
 
-// "item" is a prop: the parent (MenuPage) passes one menu record in.
 function ItemCard({ item }) {
   return (
     <article className="card">
