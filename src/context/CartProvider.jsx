@@ -1,23 +1,77 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CartContext } from "./cartContext";
 import { useStore } from "./useStore";
-import { useMenu } from "./useMenu";
 import { checkQuantity } from "../utils/quantityRule";
 import { checkDealChoice } from "../utils/dealRule";
 import { buildOrderLines, countOfItem, getCartCount, getSubtotal, makeLineId } from "../utils/cartHelpers";
 import { getOrderTotals } from "../utils/feeRules";
+import { restoreCart } from "../utils/cartStorage";
+import { useMenu } from "./useMenu";
 
 // A cart line is { id, itemId, choiceId, quantity }.
 // choiceId is for deals (the chosen drink); it is null for normal items.
 
 function CartProvider({ children }) {
   const { orderingAllowed, status, setScheduled } = useStore();
-  const { items: menuItems } = useMenu();
+  const { items: menuItems, status: menuStatus } = useMenu();
   const [lines, setLines] = useState([]);
+  // Do not save an empty cart before the saved cart has had a chance to load.
+  const [cartReady, setCartReady] = useState(false);
   // The last order that was placed, kept so the confirmation page can show it
   const [lastOrder, setLastOrder] = useState(null);
   // notice = the message shown in the toast, e.g. { id, type: "success", text, count }
   const [notice, setNotice] = useState(null);
+
+
+  // Restore the cart only after the menu has loaded. This lets us check that every
+  // saved item and every saved deal choice still exists in the current menu.
+  useEffect(() => {
+    if (menuStatus !== "ready" || cartReady) return;
+
+    try {
+      const savedCart = window.localStorage.getItem("cafe-corner-cart");
+      if (savedCart) {
+        const restored = restoreCart(savedCart, menuItems);
+        setLines(restored.lines);
+
+        if (restored.conflicts.length > 0) {
+          setNotice({
+            id: Date.now(),
+            type: "error",
+            text: `Some saved items could not be restored: ${restored.conflicts.join(" ")}`,
+          });
+        }
+      }
+    } catch {
+      setNotice({
+        id: Date.now(),
+        type: "error",
+        text: "Your saved cart could not be read. You can start a new order.",
+      });
+    }
+
+    setCartReady(true);
+  }, [menuStatus, cartReady, menuItems]);
+
+  // Save every cart change. The cartReady check prevents the initial empty state
+  // from overwriting the customer's saved cart during the menu-loading stage.
+  useEffect(() => {
+    if (!cartReady) return;
+
+    try {
+      if (lines.length === 0) {
+        window.localStorage.removeItem("cafe-corner-cart");
+      } else {
+        window.localStorage.setItem("cafe-corner-cart", JSON.stringify(lines));
+      }
+    } catch {
+      setNotice({
+        id: Date.now(),
+        type: "error",
+        text: "Your cart is working, but this browser could not save it for the next visit.",
+      });
+    }
+  }, [lines, cartReady]);
 
   // useCallback keeps the same function between renders, so the Toast timer is not reset
   const clearNotice = useCallback(() => setNotice(null), []);
