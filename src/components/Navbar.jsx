@@ -1,16 +1,27 @@
+import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { ArrowRight, Coffee, MapPin, ShoppingCart, UtensilsCrossed } from "lucide-react";
 import { useCart } from "../context/useCart";
 import { getCartCount } from "../utils/cartHelpers";
-import NavShowcase from "./NavShowcase";
+import { useHideOnScroll } from "../hooks/useHideOnScroll";
 
-// A static navbar: it is always visible at the top of the page and scrolls away with it.
+// Slim top bar on every page. It is sticky: it hides while scrolling down and returns when scrolling up.
 function Navbar() {
   const { lines } = useCart();
   const count = getCartCount(lines);
+  const scrollingDown = useHideOnScroll();
+  // Keyboard users: while focus is inside the bar it must stay visible
+  const [focusInside, setFocusInside] = useState(false);
+  const hidden = scrollingDown && !focusInside;
 
   return (
-    <header className="topbar">
+    <header
+      className={hidden ? "topbar topbar-hidden" : "topbar"}
+      onFocus={() => setFocusInside(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocusInside(false);
+      }}
+    >
       <div className="container topbar-inner">
         <Link to="/" className="topbar-brand">
           <Coffee aria-hidden="true" />
@@ -57,9 +68,6 @@ function Navbar() {
           </Link>
         </div>
       </div>
-
-      {/* Always-visible showcase: intro, categories and the auto-changing product display */}
-      <NavShowcase />
     </header>
   );
 }
