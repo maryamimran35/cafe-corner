@@ -6,6 +6,7 @@ import OpenStatus from "../components/OpenStatus";
 import { MAX_QUANTITY } from "../utils/quantityRule";
 import { countOfItem, getSubtotal } from "../utils/cartHelpers";
 import { formatPrice } from "../utils/format";
+import { DELIVERY_FEE, amountToFreeDelivery } from "../utils/feeRules";
 
 function CartPage() {
   const { lines, removeLine, setLineQuantity } = useCart();
@@ -25,6 +26,7 @@ function CartPage() {
 
   // Derived value: recalculated from the current cart on every render
   const subtotal = getSubtotal(lines, menuItems);
+  const remainingForFree = amountToFreeDelivery(subtotal);
 
   return (
     <>
@@ -88,7 +90,15 @@ function CartPage() {
       <p className="subtotal">
         Subtotal: <strong>{formatPrice(subtotal)}</strong>
       </p>
-      <p className="max-note">Checkout is added in a later stage.</p>
+      {/* Delivery pricing is shown here, before checkout, so there are no surprises later */}
+      <p className="max-note">
+        {remainingForFree > 0
+          ? `Pickup is free. Delivery is ${formatPrice(DELIVERY_FEE)}: add ${formatPrice(remainingForFree)} more for free delivery.`
+          : "Pickup is free, and your order qualifies for free delivery."}
+      </p>
+      <Link className="btn btn-primary" to="/checkout">
+        Go to checkout
+      </Link>
     </>
   );
 }

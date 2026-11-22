@@ -3,6 +3,8 @@ import Layout from "./components/Layout";
 import MenuPage from "./pages/MenuPage";
 import ItemDetailsPage from "./pages/ItemDetailsPage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import ConfirmationPage from "./pages/ConfirmationPage";
 import ContactPage from "./pages/ContactPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -14,6 +16,8 @@ function App() {
         <Route path="/" element={<MenuPage />} />
         <Route path="/items/:id" element={<ItemDetailsPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

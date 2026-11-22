@@ -4,14 +4,17 @@ import { useStore } from "./useStore";
 import { menuItems } from "../data/menuItems";
 import { checkQuantity } from "../utils/quantityRule";
 import { checkDealChoice } from "../utils/dealRule";
-import { countOfItem, getCartCount, makeLineId } from "../utils/cartHelpers";
+import { buildOrderLines, countOfItem, getCartCount, getSubtotal, makeLineId } from "../utils/cartHelpers";
+import { getOrderTotals } from "../utils/feeRules";
 
 // A cart line is { id, itemId, choiceId, quantity }.
 // choiceId is for deals (the chosen drink); it is null for normal items.
 
 function CartProvider({ children }) {
-  const { orderingAllowed, status } = useStore();
+  const { orderingAllowed, status, setScheduled } = useStore();
   const [lines, setLines] = useState([]);
+  // The last order that was placed, kept so the confirmation page can show it
+  const [lastOrder, setLastOrder] = useState(null);
   // notice = the message shown in the toast, e.g. { id, type: "success", text, count }
   const [notice, setNotice] = useState(null);
 
@@ -103,7 +106,45 @@ function CartProvider({ children }) {
     return check;
   }
 
-  const value = { lines, notice, clearNotice, addItem, removeLine, setLineQuantity };
+  // Final check when the customer presses "Place order". Every rule is checked again here,
+  // so an order can never be completed with a broken cart. Returns { ok, message, order }.
+  function placeOrder(details) {
+    const fail = (message) => ({ ok: false, message });
+
+    if (lines.length === 0) return fail("Your order is empty. Add something from the menu first.");
+    // Rule 3: closed and not scheduled
+    if (!orderingAllowed) return fail(status.message);
+
+    for (const line of lines) {
+      const item = menuItems.find((entry) => entry.id === line.itemId);
+      if (!item) return fail("An item in your order is no longer on the menu. Please review your order.");
+      // Rule 1: quantity limit
+      const quantityCheck = checkQuantity(countOfItem(lines, item.id), item.name);
+      if (!quantityCheck.ok) return fail(quantityCheck.message);
+      // Rule 2: deals need exactly one valid drink
+      if (item.deal) {
+        const dealCheck = checkDealChoice(item.deal, line.choiceId === null ? [] : [line.choiceId]);
+        if (!dealCheck.ok) return fail(`${item.name}: ${dealCheck.message}`);
+      }
+    }
+
+    const totals = getOrderTotals(getSubtotal(lines, menuItems), details.method);
+    const order = {
+      number: `CC-${Date.now().toString().slice(-6)}`,
+      details,
+      lines: buildOrderLines(lines, menuItems),
+      count: getCartCount(lines),
+      // Filled only when the shop was closed and the customer scheduled the order
+      scheduledFor: status.open ? "" : status.nextOpenLabel,
+      ...totals,
+    };
+    setLastOrder(order);
+    setLines([]);
+    setScheduled(false);
+    return { ok: true, message: "", order };
+  }
+
+  const value = { lines, lastOrder, notice, clearNotice, addItem, removeLine, setLineQuantity, placeOrder };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

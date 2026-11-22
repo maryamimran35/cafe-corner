@@ -24,3 +24,22 @@ export function getSubtotal(lines, items) {
 export function makeLineId(itemId, choiceId) {
   return `${itemId}-${choiceId ?? "none"}`;
 }
+
+// A frozen copy of the cart for the confirmation page: names and prices as they were when the order was placed
+export function buildOrderLines(lines, items) {
+  return lines.flatMap((line) => {
+    const item = items.find((entry) => entry.id === line.itemId);
+    if (!item) return [];
+    const choice = line.choiceId ? items.find((entry) => entry.id === line.choiceId) : null;
+    return [
+      {
+        key: line.id,
+        name: item.name,
+        detail: choice && item.deal ? `${item.deal.choiceLabel}: ${choice.name}` : "",
+        quantity: line.quantity,
+        unitPrice: item.price,
+        lineTotal: item.price * line.quantity,
+      },
+    ];
+  });
+}
