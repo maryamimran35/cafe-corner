@@ -137,7 +137,3 @@ The quantity rule tests are in `src/utils/quantityRule.test.js`. They cover a va
 - Cart data is stored in the current browser's local storage and is not synchronized between devices.
 - Checkout and confirmation simulate an order only. No payment is collected and no real order is sent to a restaurant.
 - The contact details and business are fictional demonstration data.
-
-## Submission note
-
-Include the source code, `package.json`, lockfile, `README.md`, `DECISIONS.md`, local data/assets, and test file in the source ZIP. Exclude `node_modules`, `dist`, `.git`, credentials, and other generated build output from the ZIP unless your instructor specifically requests them. Submit the report PDF, public GitHub repository URL, deployed website URL, and source ZIP through the required course submission system.
